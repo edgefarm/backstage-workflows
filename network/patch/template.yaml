@@ -1,0 +1,98 @@
+# Notice the v1beta3 version
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+# some metadata about the template itself
+metadata:
+  name: edgefarmpatch
+  title: Edgefarm Patch Template
+  description: edgefarm patch template
+  annotations:
+    edgefarm/visibility: public
+spec:
+  owner: ci4rail/matmah
+  type: patch
+
+  # these are the steps which are rendered in the frontend with the form input
+  # Edit the template parameters below to see how they will render in the scaffolder form UI
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - replica
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          default: test
+        replica:
+          title: Replica
+          type: integer
+          description: Amount of replicas
+          minimum: 1
+          maximum: 10
+          default: 1
+          ui:widget: range
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            allowedOwners:
+              - matmah
+              - someGithubUser
+        repoPath:
+          title: Repository Path
+          type: string
+          description: Relative path within the repository
+          ui:options:
+            rows: 5
+          default: "manifests"
+
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          replica: ${{ parameters.replica }}
+    # - id: debug-log
+    #   name: Debug Log
+    #   action: debug:log
+    #   input:
+    #     message: "${{ parameters.replica | dump }}"
+    #     listWorkspace: true
+
+    # This step publishes the contents of the working directory to GitHub.
+    - id: push
+      name: Push to git
+      action: publish:github:pull-request
+      input:
+        allowedHosts: ['github.com']
+        description: This is a patch for ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+        branchName: patch-123
+        title: patch-123
+        sourcePath: manifests
+        targetPath: manifests
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+        gitCommitMessage: Commited by backstage
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
