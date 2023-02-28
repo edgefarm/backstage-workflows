@@ -1,0 +1,167 @@
+# Notice the v1beta3 version
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+# some metadata about the template itself
+metadata:
+  name: edgefarm
+  title: Edgefarm Evaluation TemplateX
+  description: edgefarm evaluation template
+  annotations:
+    edgefarm/visibility: public
+spec:
+  owner: ci4rail/matmah
+  type: service
+
+  # these are the steps which are rendered in the frontend with the form input
+  # Edit the template parameters below to see how they will render in the scaffolder form UI
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - replica
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          default: test
+        replica:
+          title: Replica
+          type: integer
+          description: Amount of replicas
+          minimum: 1
+          maximum: 10
+          default: 1
+          ui:widget: range
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: [Group]
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:autofocus: true
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            allowedOwners:
+              - matmah
+              - someGithubUser
+        repoPath:
+          title: Repository Path
+          type: string
+          description: Relative path within the repository
+          ui:options:
+            rows: 5
+          default: "manifests"
+
+  steps:
+    - id: log-message
+      name: Log Message
+      action: debug:log
+      input:
+        message: Creating ${{ parameters.name }}
+
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          replica: ${{ parameters.replica }}
+          owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
+
+    # - id: read-file
+    #   name: Read File
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./manifests/nginx.yaml
+
+    # - id: log-message
+    #   name: Log Message
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-file'].output.content }}
+
+    # - id: read-catalog
+    #   name: Read Catalog
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./catalog-info.yaml
+
+    # - id: log-message
+    #   name: Log Message
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-catalog'].output.content }}
+
+    # - id: log-message
+    #   name: Log Message
+    #   action: debug:log
+    #   input:
+    #     message: ${{ parameters.name | lower | replace(" ", "-") }}
+    #     listWorkspace: true
+
+    # - id: debug-log
+    #   name: Debug Log
+    #   action: debug:log
+    #   input:
+    #     message: "${{ parameters.replica | dump }}"
+    #     listWorkspace: true
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+        repoVisibility: public
+        requiredApprovingReviewCount: 0
+        deleteBranchOnMerge: true
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+        allowAutoMerge: true
+
+    - id: create-argocd-resources
+      name: Create ArgoCD Resources
+      action: argocd:create-resources
+      input:
+        projectName: ${{ parameters.name | lower | replace(" ", "-") }}
+        appName: ${{ parameters.name }}
+        argoInstance: argocd
+        namespace: default
+        repoUrl: ${{ steps.publish.output.remoteUrl }}
+        # repoUrl: https://github.com/matmah/test
+        labelValue: ${{ parameters.name }}
+        path: ${{ parameters.repoPath }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
