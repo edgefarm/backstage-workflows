@@ -137,18 +137,18 @@ spec:
         gitAuthorEmail: ${{ user.entity.spec.profile.email }}
         allowAutoMerge: true
 
-    - id: create-argocd-resources
-      name: Create ArgoCD Resources
-      action: argocd:create-resources
-      input:
-        projectName: ${{ parameters.name | lower | replace(" ", "-") }}
-        appName: ${{ parameters.name }}
-        argoInstance: argocd
-        namespace: default
-        repoUrl: ${{ steps.publish.output.remoteUrl }}
-        # repoUrl: https://github.com/matmah/test
-        labelValue: ${{ parameters.name }}
-        path: ${{ parameters.repoPath }}
+    # - id: create-argocd-resources
+    #   name: Create ArgoCD Resources
+    #   action: argocd:create-resources
+    #   input:
+    #     projectName: ${{ parameters.name | lower | replace(" ", "-") }}
+    #     appName: ${{ parameters.name }}
+    #     argoInstance: argocd
+    #     namespace: default
+    #     repoUrl: ${{ steps.publish.output.remoteUrl }}
+    #     # repoUrl: https://github.com/matmah/test
+    #     labelValue: ${{ parameters.name }}
+    #     path: ${{ parameters.repoPath }}
 
     - id: register
       name: Register
