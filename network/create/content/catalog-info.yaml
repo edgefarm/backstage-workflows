@@ -11,4 +11,5 @@ metadata:
       icon: backstage
 spec:
   type: EdgeNetwork
+  owner: default:guest
   lifecycle: experimental
