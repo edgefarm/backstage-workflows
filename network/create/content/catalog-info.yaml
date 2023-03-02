@@ -11,5 +11,4 @@ metadata:
       icon: backstage
 spec:
   type: EdgeNetwork
-  owner: user:${{ values.owner }}
   lifecycle: experimental
