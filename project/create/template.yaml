@@ -33,11 +33,10 @@ spec:
           type: string
           description: Unique name of the EdgeFarm project
           maxLength: 20
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$'
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$' 
           ui:autofocus: true
           ui:options:
             rows: 5
-          default: AwesomeProject # TODO remove debug statement
 
     - title: Choose a git location
       required:
@@ -46,17 +45,13 @@ spec:
         repoUrl:
           title: Repository Location
           type: string
-          requestUserCredentials:
-            secretsKey: USER_OAUTH_TOKEN
           ui:autofocus: true
           ui:field: RepoUrlPicker
           ui:options:
+            requestUserCredentials:
+              secretsKey: USER_OAUTH_TOKEN
             allowedHosts:
               - github.com
-            allowedOwners:
-              - matmah # TODO remove debug statement
-            allowedRepos:
-              - edgefarm # TODO remove debug statement
 
   steps:
     - id: fetch-base
@@ -73,6 +68,7 @@ spec:
       action: publish:github
       input:
         allowedHosts: ['github.com']
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}
         repoVisibility: public

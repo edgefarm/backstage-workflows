@@ -28,11 +28,10 @@ spec:
           type: string
           description: Unique name of the kubernetes node
           maxLength: 8
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$'
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$' # TODO adjust pattern regarding kubernetes node name restrictions
           ui:autofocus: true
           ui:options:
             rows: 5
-          default: Node1 # TODO remove debug statement
 
     - title: Choose a location
       required:
@@ -48,10 +47,6 @@ spec:
               secretsKey: USER_OAUTH_TOKEN
             allowedHosts:
               - github.com
-            allowedOwners:
-              - matmah
-            allowedRepos:
-              - edgefarm
 
   steps:
     - id: fetch-base
@@ -68,6 +63,7 @@ spec:
       name: Create Pull Request
       action: publish:github:pull-request
       input:
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
         repoUrl: ${{ parameters.repoUrl }}
         branchName: add-node-${{ parameters.name }}-definition
         title: Add node ${{ parameters.name }} definition
