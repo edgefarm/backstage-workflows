@@ -1,0 +1,77 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: edgefarm-node-add
+  title: Add a new node to the edgefarm
+  description: Add a new node to the edgefarm
+spec:
+  type: service
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - clusterName
+      properties:
+        clusterName:
+          title: Target cluster
+          type: string
+          description: The target cluster the node will be related to
+          default: minikube
+          enum:
+            - minikube
+            - linode1
+          enumNames:
+            - 'Local Minikube Cluster'
+            - 'Linode 1'
+        name:
+          title: Name of the node
+          type: string
+          description: Unique name of the kubernetes node
+          maxLength: 8
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$' # TODO adjust pattern regarding kubernetes node name restrictions
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:autofocus: true
+          ui:field: RepoUrlPicker
+          ui:options:
+            requestUserCredentials:
+              secretsKey: USER_OAUTH_TOKEN
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        targetPath: nodes/${{ parameters.name }}
+        values:
+          clusterName: ${{ parameters.clusterName }}
+          nodeName: ${{ parameters.name }}
+          owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
+    - id: pull-request
+      name: Create Pull Request
+      action: publish:github:pull-request
+      input:
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
+        repoUrl: ${{ parameters.repoUrl }}
+        branchName: add-node-${{ parameters.name }}-definition
+        title: Add node ${{ parameters.name }} definition
+        description: Adds a new node with name ${{ parameters.name }}
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+
+  output:
+    links:
+      - title: Open pull request
+        url: ${{ steps['pull-request'].output.remoteUrl }}

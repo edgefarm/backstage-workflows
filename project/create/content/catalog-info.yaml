@@ -1,0 +1,21 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: ${{ values.projectName }}
+spec:
+  owner: ${{ values.owner }}
+  targets:
+    - ./nodes/**
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.projectName }}
+  description: This project contains all components for a EdgeFarm
+  tags: 
+    - edgefarm
+    - project
+spec:
+  type: service
+  lifecycle: production
+  owner: ${{ values.owner }}

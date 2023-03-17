@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.nodeName }}
+  annotations:
+    'edgefarm.io/cluster': ${{ values.clusterName }}
+spec:
+  type: Node
+  owner: ${{ values.owner }}
+  lifecycle: experimental
