@@ -1,0 +1,99 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: edgefarm-project-add
+  title: Adds a new EdgeFarm project to the catalog
+  description: Create a new EdgeFarm project. This will then be registered here in the catalog. The process will also create a new Git repository.
+  tags:
+    - edgefarm
+    - project
+    - recommended
+    - git
+spec:
+  type: service
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - clusterName
+      properties:
+        clusterName:
+          title: Target cluster
+          type: string
+          description: The target cluster the project will be related to
+          default: minikube
+          enum:
+            - minikube
+            - linode1
+          enumNames:
+            - 'Local Minikube Cluster'
+            - 'Linode 1'
+        name:
+          title: Name of the project
+          type: string
+          description: Unique name of the EdgeFarm project
+          maxLength: 20
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$'
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+          default: AwesomeProject # TODO remove debug statement
+
+    - title: Choose a git location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          requestUserCredentials:
+            secretsKey: USER_OAUTH_TOKEN
+          ui:autofocus: true
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            allowedOwners:
+              - matmah # TODO remove debug statement
+            allowedRepos:
+              - edgefarm # TODO remove debug statement
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          clusterName: ${{ parameters.clusterName }}
+          projectName: ${{ parameters.name }}
+          owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
+    - id: publish
+      name: Create a new repository
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+        repoVisibility: public
+        requiredApprovingReviewCount: 0
+        deleteBranchOnMerge: true
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+        allowAutoMerge: true
+        defaultBranch: main
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Open repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
