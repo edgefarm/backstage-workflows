@@ -2,13 +2,19 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: edgefarm-project-add
-  title: Adds a new EdgeFarm project to the catalog
-  description: Create a new EdgeFarm project. This will then be registered here in the catalog. The process will also create a new Git repository.
+  title: New Project
+  description: |
+     Create a new EdgeFarm project. This will then be registered here in the catalog. The process will also create a new Git repository.
+
+     This is the entry point for every new EdgeFarm. A project is like a workspace, where all your confirgurations lives.
   tags:
     - edgefarm
     - project
     - recommended
     - git
+  links:
+    - title: Documentation
+      url: https://edgefarm.io/docs/projects
 spec:
   type: service
   parameters:
