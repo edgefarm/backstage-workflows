@@ -6,4 +6,5 @@ metadata:
 spec:
   targets:
     - ./nodes/create/template.yaml
-    - ./project/create/template.yaml
+    - ./system/create/template.yaml
+    - ./network/create/template.yaml

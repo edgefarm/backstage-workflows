@@ -3,13 +3,13 @@ kind: Component
 metadata:
   name: ${{ values.name | dump }}
   annotations:
-    backstage.io/kubernetes-label-selector: 'app=edge-network-${{ values.name | lower | replace(" ", "-") }}'
-    argocd/app-name: ${{ values.name }}
+    'edgefarm.io/cluster': ${{ values.clusterName }}
   links:
     - url: https://www.ci4rail.com
       title: Ci4Rail Website
       icon: backstage
 spec:
-  type: EdgeNetwork
-  owner: default:guest
-  lifecycle: experimental
+  type: network
+  owner: ${{ values.owner }}
+  lifecycle: production
+  system: ${{ values.system }}

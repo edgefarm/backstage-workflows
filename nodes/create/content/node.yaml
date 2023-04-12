@@ -3,8 +3,9 @@ kind: Component
 metadata:
   name: ${{ values.nodeName }}
   annotations:
-    'edgefarm.io/cluster': ${{ values.clusterName }}
+    "edgefarm.io/cluster": ${{ values.clusterName }}
 spec:
   type: Node
   owner: ${{ values.owner }}
-  lifecycle: experimental
+  lifecycle: production
+  system: ${{ values.system }}

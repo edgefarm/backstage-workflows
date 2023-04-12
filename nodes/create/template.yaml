@@ -2,53 +2,41 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: edgefarm-node-add
-  title: Add a new node to the edgefarm
-  description: Add a new node to the edgefarm
+  title: Add Node
+  description: Add a node to the edgefarm
 spec:
   type: service
   parameters:
     - title: Fill in some steps
       required:
         - name
-        - clusterName
+        - system
       properties:
-        clusterName:
-          title: Target cluster
+        system:
+          title: Select your system
+          description: Here you can select one of your existing systems. If you don't have any, you need to create one first.
           type: string
-          description: The target cluster the node will be related to
-          default: minikube
-          enum:
-            - minikube
-            - linode1
-          enumNames:
-            - 'Local Minikube Cluster'
-            - 'Linode 1'
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              - kind: system
+            defaultKind: System
         name:
           title: Name of the node
           type: string
           description: Unique name of the kubernetes node
-          maxLength: 8
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$' # TODO adjust pattern regarding kubernetes node name restrictions
+          maxLength: 253 # DNS subdomain name rules: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
+          pattern: "^[a-z0-9][a-z0-9-]*$"
           ui:autofocus: true
           ui:options:
             rows: 5
 
-    - title: Choose a location
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
-          type: string
-          ui:autofocus: true
-          ui:field: RepoUrlPicker
-          ui:options:
-            requestUserCredentials:
-              secretsKey: USER_OAUTH_TOKEN
-            allowedHosts:
-              - github.com
-
   steps:
+    - id: system-fetch
+      name: Fetch system entity
+      action: catalog:fetch
+      input:
+        entityRef: ${{ parameters.system }}
     - id: fetch-base
       name: Fetch Base
       action: fetch:template
@@ -56,15 +44,32 @@ spec:
         url: ./content
         targetPath: nodes/${{ parameters.name }}
         values:
-          clusterName: ${{ parameters.clusterName }}
+          clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
           nodeName: ${{ parameters.name }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
+          system: ${{ parameters.system }}
+    - id: list-workspace
+      name: List Workspace
+      action: debug:log
+      input:
+        listWorkspace: true
+    - id: read-file
+      name: Read File
+      action: ci4rail:fs:read
+      input:
+        path: ./nodes/${{ parameters.name }}/node.yaml
+    - id: log-message
+      name: Log Message
+      action: debug:log
+      input:
+        message: ${{ steps['read-file'].output.content }}
+
     - id: pull-request
       name: Create Pull Request
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}
-        repoUrl: ${{ parameters.repoUrl }}
+        repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
         branchName: add-node-${{ parameters.name }}-definition
         title: Add node ${{ parameters.name }} definition
         description: Adds a new node with name ${{ parameters.name }}

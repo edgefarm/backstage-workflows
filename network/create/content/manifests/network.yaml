@@ -1,0 +1,84 @@
+apiVersion: streams.network.edgefarm.io/v1alpha1
+kind: Network
+metadata:
+  name: ${{ values.name }}
+  {% if values.namespace -%}
+  namespace: ${{ values.namespace }}
+  {%- endif %}
+spec:
+  writeConnectionSecretToRef:
+    name: ${{ values.name }}-secrets # TODO Name needs to be clarified
+  parameters:
+    users:
+    {% for user in values.users -%}
+      - name: ${{ user.name }}
+        limits:
+          payload: ${{ user.limits.payload }}
+          data: ${{ user.limits.data }}
+          subscriptions: ${{ user.limits.subscriptions }}
+        permissions:
+          pub:
+            {% if not user.permissions.pub.allow|length -%}
+            allow: []
+            {% else -%}
+            allow:
+            {% for value in user.permissions.pub.allow -%}
+              - ${{ value }}
+            {% endfor -%}
+            {% endif -%}
+            {% if not user.permissions.pub.deny|length -%}
+            deny: []
+            {% else -%}
+            deny:
+            {% for value in user.permissions.pub.deny -%}
+              - ${{ value }}
+            {% endfor -%}
+            {%- endif %}
+          sub:
+            {% if not user.permissions.sub.allow|length -%}
+            allow: []
+            {% else -%}
+            allow:
+            {% for value in user.permissions.sub.allow -%}
+              - ${{ value }}
+            {% endfor -%}
+            {% endif -%}
+            {% if not user.permissions.sub.deny|length -%}
+            deny: []
+            {% else -%}
+            deny:
+            {% for value in user.permissions.sub.deny -%}
+              - ${{ value }}
+            {% endfor -%}
+            {%- endif %}
+    {% endfor -%}
+    subNetworks: 
+    {%- for subnetwork in values.subnetworks %}
+      - name: ${{ subnetwork.name }} # TODO Name needs to be clarified. Generated name?
+        limits:
+          fileStorage: ${{ subnetwork.fileStorage }}
+          inMemoryStorage: ${{ subnetwork.inMemoryStorage }}
+        tolerations: []{% endfor %} # TODO Name needs to be clarified.
+    streams: 
+    {% for stream in values.streams -%}
+      - name: ${{ stream.name }}
+        config:
+          subjects:
+          {% for subject in stream.config.subjects -%}
+            - ${{ subject }}
+          {%- endfor %}
+          discard: ${{ stream.config.discard }}
+          retention: ${{ stream.config.retention }}
+          storage: ${{ stream.config.storage }}
+          maxConsumers: ${{ stream.config.maxConsumers }}
+          maxMsgSize: ${{ stream.config.maxMsgSize }}
+          maxMsgs: ${{ stream.config.maxMsgs }}
+          maxMsgsPerSubject: ${{ stream.config.maxMsgsPerSubject }}
+          maxBytes: ${{ stream.config.maxBytes }}
+        type: Standard # TODO To be clarified
+        {% endfor %}
+    resourceConfig:
+      natssecrets:
+        providerConfigName: providerconfig-natssecrets
+      kubernetes:
+        providerConfigName: kubernetes-provider

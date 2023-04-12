@@ -3,165 +3,323 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 # some metadata about the template itself
 metadata:
-  name: edgefarm
-  title: Edgefarm Evaluation TemplateX
-  description: edgefarm evaluation template
+  name: edgefarm-network-add
+  title: New Network
+  description: Add a new network to the edgefarm
+  tags:
+    - edgefarm
+    - network
+    - recommended
+    - streaming
+    - nats
+  links:
+    - title: Documentation
+      url: https://edgefarm.io/docs/networks
   annotations:
     edgefarm/visibility: public
 spec:
-  owner: ci4rail/matmah
   type: service
-
-  # these are the steps which are rendered in the frontend with the form input
-  # Edit the template parameters below to see how they will render in the scaffolder form UI
   parameters:
-    - title: Fill in some steps
+    - title: Specify some general parameters here
       required:
+        - system
         - name
-        - replica
+        - namespace
       properties:
-        name:
-          title: Name
+        system:
+          title: Select your system
+          description:
+            Here you can select one of your existing systems. If you don't have
+            any, you need to create one first.
           type: string
-          description: Unique name of the component
-          ui:autofocus: true
-          ui:options:
-            rows: 5
-          default: test
-        replica:
-          title: Replica
-          type: integer
-          description: Amount of replicas
-          minimum: 1
-          maximum: 10
-          default: 1
-          ui:widget: range
-        owner:
-          title: Owner
-          type: string
-          description: Owner of the component
-          ui:field: OwnerPicker
+          ui:field: EntityPicker
           ui:options:
             catalogFilter:
-              kind: [Group]
-
-    - title: Choose a location
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
+              - kind: system
+            defaultKind: System
+        name:
+          title: Name of the network
           type: string
+          maxLength: 253
+          pattern: ^[a-z0-9][a-z0-9-]*$
           ui:autofocus: true
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - github.com
-            allowedOwners:
-              - matmah
-              - someGithubUser
-        repoPath:
-          title: Repository Path
-          type: string
-          description: Relative path within the repository
           ui:options:
             rows: 5
-          default: "manifests"
-
+        namespace:
+          title: Namespace of the network
+          type: string
+          maxLength: 253
+          pattern: ^[a-z0-9][a-z0-9-]*$
+          ui:options:
+            rows: 5
+    - title: Specify the subnetworks
+      required:
+        - subnetworks
+      properties:
+        subnetworks:
+          type: array
+          title: Subnetworks
+          description: Here you can add one or more subnetworks to the network.
+          minItems: 1
+          ui:options:
+            orderable: false
+          items:
+            type: object
+            required:
+              - name
+              - fileStorage
+              - inMemoryStorage
+            properties:
+              name:
+                type: string
+                title: Name of subnetwork
+                description:
+                  The name of the subnetwork. This name will be used as a prefix for
+                  the subnetwork's resources.
+                ui:autofocus: true
+              fileStorage:
+                type: string
+                default: 1Gi
+                pattern: ^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$
+                title: Specify how much file storage the network should have. (e.g. 1Gi)
+              inMemoryStorage:
+                type: string
+                default: 100Mi
+                pattern: ^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$
+                title: Specify how much in-memory storage the network should have. (e.g. 1Gi)
+    - title: Specify the NATS streams
+      required:
+        - streams
+      properties:
+        streams:
+          title: Streams
+          type: array
+          minItems: 1
+          ui:options:
+            orderable: false
+          items:
+            type: object
+            required:
+              - name
+              - config
+            ui:options:
+              orderable: false
+            properties:
+              name:
+                type: string
+                title: Name of the Stream
+                ui:autofocus: true
+              config:
+                type: object
+                required:
+                  - subjects
+                  - discard
+                  - retention
+                  - storage
+                  - maxConsumers
+                  - maxMsgSize
+                  - maxMsgs
+                  - maxMsgsPerSubject
+                  - maxBytes
+                properties:
+                  subjects:
+                    type: array
+                    minItems: 1
+                    ui:options:
+                      orderable: false
+                    items:
+                      type: string
+                      title: Subject
+                  discard:
+                    type: string
+                    title: Discard
+                    default: Old
+                    enum:
+                      - Old
+                      - New
+                      - All
+                    enumNames:
+                      - Old
+                      - New
+                      - All
+                  retention:
+                    type: string
+                    title: Retention
+                    default: Limits
+                    enum:
+                      - Limits
+                      - Interest
+                      - WorkQueue
+                      - File
+                      - Memory
+                    enumNames:
+                      - Limits
+                      - Interest
+                      - WorkQueue
+                      - File
+                      - Memory
+                  storage:
+                    type: string
+                    title: Storage
+                    default: File
+                    enum:
+                      - File
+                      - Memory
+                    enumNames:
+                      - File
+                      - Memory
+                  maxConsumers:
+                    default: -1
+                    type: integer
+                    minimun: -1
+                    ui:widget: updown
+                  maxMsgSize:
+                    default: -1
+                    type: integer
+                    minimun: -1
+                    ui:widget: updown
+                  maxMsgs:
+                    default: -1
+                    type: integer
+                    minimun: -1
+                    ui:widget: updown
+                  maxMsgsPerSubject:
+                    default: -1
+                    type: integer
+                    minimun: -1
+                    ui:widget: updown
+                  maxBytes:
+                    default: 102400
+                    type: integer
+                    minimun: 1
+                    ui:widget: updown
+    - title: Specify the users
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          title: Users
+          description: Here you can add one or more users to the network.
+          minItems: 1
+          ui:options:
+            orderable: false
+          items:
+            type: object
+            required: []
+            properties:
+              name:
+                type: string
+                title: Unique name of the user
+                description:
+                  The name of the user. This name will be used as a prefix for the
+                  user's resources.
+                ui:autofocus: true
+              limits:
+                type: object
+                properties:
+                  payload:
+                    type: integer
+                    title: Payload
+                    description: The maximum payload size in bytes.
+                    default: 1000
+                  data:
+                    type: integer
+                    title: Data
+                    description: The maximum data size in bytes.
+                    default: -1
+                    minimium: -1
+                  subscriptions:
+                    type: integer
+                    title: Subscriptions
+                    description: The maximum number of subscriptions.
+                    default: -1
+                    minimium: -1
+              permissions:
+                type: object
+                properties:
+                  pub:
+                    type: object
+                    properties:
+                      allow:
+                        type: array
+                        title: Allow
+                        description: The list of subjects that are allowed to publish to the network.
+                        items:
+                          type: string
+                      deny:
+                        type: array
+                        title: Deny
+                        description:
+                          The list of subjects that are not allowed to publish to the
+                          network.
+                        items:
+                          type: string
+                  sub:
+                    type: object
+                    properties:
+                      allow:
+                        type: array
+                        title: Allow
+                        description: The list of subjects that are allowed to subscribe to the network.
+                        items:
+                          type: string
+                      deny:
+                        type: array
+                        title: Deny
+                        description:
+                          The list of subjects that are not allowed to subscribe to the
+                          network.
+                        items:
+                          type: string
   steps:
-    - id: log-message
-      name: Log Message
-      action: debug:log
+    - id: system-fetch
+      name: Fetch system entity
+      action: catalog:fetch
       input:
-        message: Creating ${{ parameters.name }}
-
+        entityRef: ${{ parameters.system }}
     - id: fetch-base
       name: Fetch Base
       action: fetch:template
       input:
         url: ./content
+        targetPath: networks/${{ parameters.name }}
         values:
+          clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
           name: ${{ parameters.name }}
-          replica: ${{ parameters.replica }}
+          namespace: ${{ parameters.namespace }}
+          subnetworks: ${{ parameters.subnetworks }}
+          streams: ${{ parameters.streams }}
+          users: ${{ parameters.users }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
-
-    # - id: read-file
-    #   name: Read File
-    #   action: ci4rail:fs:read
-    #   input:
-    #     path: ./manifests/nginx.yaml
-
-    # - id: log-message
-    #   name: Log Message
-    #   action: debug:log
-    #   input:
-    #     message: ${{ steps['read-file'].output.content }}
-
-    # - id: read-catalog
-    #   name: Read Catalog
-    #   action: ci4rail:fs:read
-    #   input:
-    #     path: ./catalog-info.yaml
-
-    # - id: log-message
-    #   name: Log Message
-    #   action: debug:log
-    #   input:
-    #     message: ${{ steps['read-catalog'].output.content }}
-
-    # - id: log-message
-    #   name: Log Message
-    #   action: debug:log
-    #   input:
-    #     message: ${{ parameters.name | lower | replace(" ", "-") }}
-    #     listWorkspace: true
-
-    # - id: debug-log
-    #   name: Debug Log
-    #   action: debug:log
-    #   input:
-    #     message: "${{ parameters.replica | dump }}"
-    #     listWorkspace: true
-
-    - id: publish
-      name: Publish
-      action: publish:github
+          system: ${{ parameters.system }}
+    - id: list-workspace
+      name: List Workspace
+      action: debug:log
       input:
-        allowedHosts: ['github.com']
-        description: This is ${{ parameters.name }}
-        repoUrl: ${{ parameters.repoUrl }}
-        repoVisibility: public
-        requiredApprovingReviewCount: 0
-        deleteBranchOnMerge: true
-        gitAuthorName: ${{ user.entity.metadata.name }}
-        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
-        allowAutoMerge: true
-
-    # - id: create-argocd-resources
-    #   name: Create ArgoCD Resources
-    #   action: argocd:create-resources
-    #   input:
-    #     projectName: ${{ parameters.name | lower | replace(" ", "-") }}
-    #     appName: ${{ parameters.name }}
-    #     argoInstance: argocd
-    #     namespace: default
-    #     repoUrl: ${{ steps.publish.output.remoteUrl }}
-    #     # repoUrl: https://github.com/matmah/test
-    #     labelValue: ${{ parameters.name }}
-    #     path: ${{ parameters.repoPath }}
-
-    - id: register
-      name: Register
-      action: catalog:register
+        listWorkspace: true
+    - id: read-file
+      name: Read File
+      action: ci4rail:fs:read
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
-
-  # Outputs are displayed to the user after a successful execution of the template.
+        path: ./networks/${{ parameters.name }}/manifests/network.yaml
+    - id: log-message
+      name: Log Message
+      action: debug:log
+      input:
+        message: ${{ steps['read-file'].output.content }}
+    - id: read-file2
+      name: Read File
+      action: ci4rail:fs:read
+      input:
+        path: ./networks/${{ parameters.name }}/catalog-info.yaml
+    - id: log-message2
+      name: Output catalog-info.yaml
+      action: debug:log
+      input:
+        message: ${{ steps['read-file2'].output.content }}
   output:
     links:
-      - title: Repository
-        url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Open in catalog
-        icon: catalog
-        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: Open pull request
+        description: foobar
+        url: ${{ steps['pull-request'].output.remoteUrl }}
