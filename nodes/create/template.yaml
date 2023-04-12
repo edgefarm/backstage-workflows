@@ -65,7 +65,7 @@ spec:
       name: Read File
       action: ci4rail:fs:read
       input:
-        path: ./nodes/${{ parameters.name }}/node.yaml
+        path: ./nodes/${{ parameters.name }}/catalog-info.yaml
     - id: log-message
       name: Log Message
       action: debug:log
