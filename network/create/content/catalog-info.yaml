@@ -3,7 +3,6 @@ kind: Component
 metadata:
   name: ${{ values.name | dump }}
   annotations:
-    argocd/app-name: ${{ values.name }}
     'edgefarm.io/cluster': ${{ values.clusterName }}
   links:
     - url: https://www.ci4rail.com
@@ -13,3 +12,4 @@ spec:
   type: network
   owner: ${{ values.owner }}
   lifecycle: production
+  system: ${{ values.system }}

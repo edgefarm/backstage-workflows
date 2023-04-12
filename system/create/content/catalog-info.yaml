@@ -1,9 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: ${{ values.projectName }}
-  annotations:
-    'edgefarm.io/cluster': ${{ values.clusterName }}
+  name: ${{ values.systemName }}
 spec:
   owner: ${{ values.owner }}
   targets:
@@ -11,14 +9,16 @@ spec:
     - ./networks/**
 ---
 apiVersion: backstage.io/v1alpha1
-kind: Component
+kind: System
 metadata:
-  name: ${{ values.projectName }}
-  description: This project contains all components for a EdgeFarm
-  tags: 
+  name: ${{ values.systemName }}
+  description: This system contains all components for a EdgeFarm
+  tags:
     - edgefarm
     - project
+  annotations:
+    "edgefarm.io/cluster": ${{ values.clusterName }}
+    "edgefarm.io/repo": ${{ values.repoUrl }}
 spec:
-  type: project
   lifecycle: production
   owner: ${{ values.owner }}

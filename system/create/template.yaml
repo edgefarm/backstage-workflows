@@ -1,20 +1,17 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: edgefarm-project-add
-  title: New Project
+  name: edgefarm-system-add
+  title: New System
   description: |
-     Create a new EdgeFarm project. This will then be registered here in the catalog. The process will also create a new Git repository.
+     Create a new EdgeFarm system. This will then be registered here in the catalog. The process will also create a new Git repository.
 
-     This is the entry point for every new EdgeFarm. A project is like a workspace, where all your confirgurations lives.
+     This is the entry point for every new EdgeFarm. A system is like a workspace, where all your configurations lives.
   tags:
     - edgefarm
     - project
     - recommended
     - git
-  links:
-    - title: Documentation
-      url: https://edgefarm.io/docs/projects
 spec:
   type: service
   parameters:
@@ -26,7 +23,7 @@ spec:
         clusterName:
           title: Target cluster
           type: string
-          description: The target cluster the project will be related to
+          description: The target cluster the system will be related to
           default: minikube
           enum:
             - minikube
@@ -35,9 +32,9 @@ spec:
             - 'Local Minikube Cluster'
             - 'Linode 1'
         name:
-          title: Name of the project
+          title: Name of the system
           type: string
-          description: Unique name of the EdgeFarm project
+          description: Unique name of the EdgeFarm system
           maxLength: 20
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$' 
           ui:autofocus: true
@@ -67,7 +64,8 @@ spec:
         url: ./content
         values:
           clusterName: ${{ parameters.clusterName }}
-          projectName: ${{ parameters.name }}
+          repoUrl: ${{ parameters.repoUrl }}
+          systemName: ${{ parameters.name }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
     - id: publish
       name: Create a new repository

@@ -13,57 +13,43 @@ metadata:
   links:
     - title: Documentation
       url: https://edgefarm.io/docs/networks
+  annotations:
+    edgefarm/visibility: public
 spec:
   type: service
   parameters:
-
     - title: Specify some general parameters here
       required:
-        - clusterName
+        - system
         - name
+        - namespace
       properties:
-        clusterName:
-          title: Target cluster
+        system:
+          title: Select your system
+          description:
+            Here you can select one of your existing systems. If you don't have
+            any, you need to create one first.
           type: string
-          description: The target cluster the node will be related to
-          default: minikube
-          enum:
-            - minikube
-            - linode1
-          enumNames:
-            - "Local Minikube Cluster"
-            - "Linode 1"
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              - kind: system
+            defaultKind: System
         name:
           title: Name of the network
           type: string
-          maxLength: 253 # DNS subdomain name rules: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
-          pattern: "^[a-z0-9][a-z0-9-]*$"
+          maxLength: 253
+          pattern: ^[a-z0-9][a-z0-9-]*$
           ui:autofocus: true
           ui:options:
             rows: 5
         namespace:
           title: Namespace of the network
           type: string
-          maxLength: 253 # DNS subdomain name rules: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
-          pattern: "^[a-z0-9][a-z0-9-]*$"
+          maxLength: 253
+          pattern: ^[a-z0-9][a-z0-9-]*$
           ui:options:
             rows: 5
-
-    - title: Specify here the repository where the Kubernetes manifests should be stored.
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
-          type: string
-          ui:autofocus: true
-          ui:field: RepoUrlPicker
-          ui:options:
-            requestUserCredentials:
-              secretsKey: USER_OAUTH_TOKEN
-            allowedHosts:
-              - github.com
-
     - title: Specify the subnetworks
       required:
         - subnetworks
@@ -85,19 +71,20 @@ spec:
               name:
                 type: string
                 title: Name of subnetwork
-                description: The name of the subnetwork. This name will be used as a prefix for the subnetwork's resources.
+                description:
+                  The name of the subnetwork. This name will be used as a prefix for
+                  the subnetworks resources.
                 ui:autofocus: true
               fileStorage:
                 type: string
                 default: 1Gi
-                pattern: "^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$"
+                pattern: ^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$
                 title: Specify how much file storage the network should have. (e.g. 1Gi)
               inMemoryStorage:
                 type: string
                 default: 100Mi
-                pattern: "^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$"
+                pattern: ^[1-9][0-9]*(Ki|Mi|Gi|Ti|Pi|Ei)*$
                 title: Specify how much in-memory storage the network should have. (e.g. 1Gi)
-
     - title: Specify the NATS streams
       required:
         - streams
@@ -182,29 +169,28 @@ spec:
                   maxConsumers:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgSize:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgs:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgsPerSubject:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxBytes:
                     default: 102400
                     type: integer
-                    minimun: 1
+                    minimum: 1
                     ui:widget: updown
-
     - title: Specify the users
       required:
         - users
@@ -223,7 +209,9 @@ spec:
               name:
                 type: string
                 title: Unique name of the user
-                description: The name of the user. This name will be used as a prefix for the user's resources.
+                description:
+                  The name of the user. This name will be used as a prefix for the
+                  user's resources.
                 ui:autofocus: true
               limits:
                 type: object
@@ -238,13 +226,13 @@ spec:
                     title: Data
                     description: The maximum data size in bytes.
                     default: -1
-                    minimium: -1
+                    minimum: -1
                   subscriptions:
                     type: integer
                     title: Subscriptions
                     description: The maximum number of subscriptions.
                     default: -1
-                    minimium: -1
+                    minimum: -1
               permissions:
                 type: object
                 properties:
@@ -260,7 +248,9 @@ spec:
                       deny:
                         type: array
                         title: Deny
-                        description: The list of subjects that are not allowed to publish to the network.
+                        description:
+                          The list of subjects that are not allowed to publish to the
+                          network.
                         items:
                           type: string
                   sub:
@@ -275,11 +265,17 @@ spec:
                       deny:
                         type: array
                         title: Deny
-                        description: The list of subjects that are not allowed to subscribe to the network.
+                        description:
+                          The list of subjects that are not allowed to subscribe to the
+                          network.
                         items:
                           type: string
-
   steps:
+    - id: system-fetch
+      name: Fetch system entity
+      action: catalog:fetch
+      input:
+        entityRef: ${{ parameters.system }}
     - id: fetch-base
       name: Fetch Base
       action: fetch:template
@@ -287,13 +283,14 @@ spec:
         url: ./content
         targetPath: networks/${{ parameters.name }}
         values:
-          clusterName: ${{ parameters.clusterName }}
+          clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
           name: ${{ parameters.name }}
           namespace: ${{ parameters.namespace }}
           subnetworks: ${{ parameters.subnetworks }}
           streams: ${{ parameters.streams }}
           users: ${{ parameters.users }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
+          system: ${{ parameters.system }}
     - id: list-workspace
       name: List Workspace
       action: debug:log
@@ -309,19 +306,30 @@ spec:
       action: debug:log
       input:
         message: ${{ steps['read-file'].output.content }}
+    - id: read-file2
+      name: Read File
+      action: ci4rail:fs:read
+      input:
+        path: ./networks/${{ parameters.name }}/catalog-info.yaml
+    - id: log-message2
+      name: Output catalog-info.yaml
+      action: debug:log
+      input:
+        message: ${{ steps['read-file2'].output.content }}
+
     - id: pull-request
       name: Create Pull Request
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}
-        repoUrl: ${{ parameters.repoUrl }}
+        repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
         branchName: add-network-${{ parameters.name }}-definition
         title: Add network ${{ parameters.name }} definition
-        description: Adds a new network with name ${{ parameters.name }}
+        description: Adds a network with name ${{ parameters.name }}
         gitAuthorName: ${{ user.entity.metadata.name }}
         gitAuthorEmail: ${{ user.entity.spec.profile.email }}
-
   output:
     links:
       - title: Open pull request
+        description: foobar
         url: ${{ steps['pull-request'].output.remoteUrl }}
