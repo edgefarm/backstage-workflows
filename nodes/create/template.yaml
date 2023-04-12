@@ -2,8 +2,16 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: edgefarm-node-add
-  title: Add Node
-  description: Add a node to the edgefarm
+  title: New Node
+  description: Add a new node to the edgefarm
+  tags:
+    - edgefarm
+    - node
+    - recommended
+    - kubernetes
+  links:
+    - title: Documentation
+      url: https://edgefarm.io/docs/nodes
 spec:
   type: service
   parameters:

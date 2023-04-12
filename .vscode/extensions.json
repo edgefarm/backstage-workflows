@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "intility.vscode-backstage",
+        "elagil.pre-commit-helper",
+        "esbenp.prettier-vscode"
+    ]
+}
