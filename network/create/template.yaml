@@ -37,15 +37,12 @@ spec:
             defaultKind: System
         name:
           title: Name of the network
-          title: Name of the network
           type: string
           maxLength: 253
           pattern: ^[a-z0-9][a-z0-9-]*$
           ui:autofocus: true
           ui:options:
             rows: 5
-        namespace:
-          title: Namespace of the network
         namespace:
           title: Namespace of the network
           type: string
@@ -76,7 +73,7 @@ spec:
                 title: Name of subnetwork
                 description:
                   The name of the subnetwork. This name will be used as a prefix for
-                  the subnetwork's resources.
+                  the subnetworks resources.
                 ui:autofocus: true
               fileStorage:
                 type: string
@@ -172,27 +169,27 @@ spec:
                   maxConsumers:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgSize:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgs:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxMsgsPerSubject:
                     default: -1
                     type: integer
-                    minimun: -1
+                    minimum: -1
                     ui:widget: updown
                   maxBytes:
                     default: 102400
                     type: integer
-                    minimun: 1
+                    minimum: 1
                     ui:widget: updown
     - title: Specify the users
       required:
@@ -229,13 +226,13 @@ spec:
                     title: Data
                     description: The maximum data size in bytes.
                     default: -1
-                    minimium: -1
+                    minimum: -1
                   subscriptions:
                     type: integer
                     title: Subscriptions
                     description: The maximum number of subscriptions.
                     default: -1
-                    minimium: -1
+                    minimum: -1
               permissions:
                 type: object
                 properties:
@@ -285,14 +282,9 @@ spec:
       input:
         url: ./content
         targetPath: networks/${{ parameters.name }}
-        targetPath: networks/${{ parameters.name }}
         values:
           clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
           name: ${{ parameters.name }}
-          namespace: ${{ parameters.namespace }}
-          subnetworks: ${{ parameters.subnetworks }}
-          streams: ${{ parameters.streams }}
-          users: ${{ parameters.users }}
           namespace: ${{ parameters.namespace }}
           subnetworks: ${{ parameters.subnetworks }}
           streams: ${{ parameters.streams }}
@@ -324,6 +316,18 @@ spec:
       action: debug:log
       input:
         message: ${{ steps['read-file2'].output.content }}
+
+    - id: pull-request
+      name: Create Pull Request
+      action: publish:github:pull-request
+      input:
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
+        repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
+        branchName: add-network-${{ parameters.name }}-definition
+        title: Add network ${{ parameters.name }} definition
+        description: Adds a network with name ${{ parameters.name }}
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
   output:
     links:
       - title: Open pull request

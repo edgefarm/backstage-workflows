@@ -6,6 +6,7 @@ spec:
   owner: ${{ values.owner }}
   targets:
     - ./nodes/**
+    - ./networks/**
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
