@@ -7,3 +7,4 @@ spec:
   targets:
     - ./nodes/create/template.yaml
     - ./project/create/template.yaml
+    - ./network/create/template.yaml

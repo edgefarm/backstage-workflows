@@ -2,10 +2,13 @@ apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
   name: ${{ values.projectName }}
+  annotations:
+    'edgefarm.io/cluster': ${{ values.clusterName }}
 spec:
   owner: ${{ values.owner }}
   targets:
     - ./nodes/**
+    - ./networks/**
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -16,6 +19,6 @@ metadata:
     - edgefarm
     - project
 spec:
-  type: service
+  type: project
   lifecycle: production
   owner: ${{ values.owner }}

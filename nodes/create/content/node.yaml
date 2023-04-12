@@ -7,4 +7,4 @@ metadata:
 spec:
   type: Node
   owner: ${{ values.owner }}
-  lifecycle: experimental
+  lifecycle: production
