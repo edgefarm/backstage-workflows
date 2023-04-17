@@ -7,6 +7,7 @@ spec:
   targets:
     - ./nodes/*/catalog-info.yaml
     - ./networks/*/catalog-info.yaml
+    - ./applications/*/catalog-info.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
