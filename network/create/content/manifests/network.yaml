@@ -54,28 +54,43 @@ spec:
     {% endfor -%}
     subNetworks: 
     {%- for subnetwork in values.subnetworks %}
-      - name: ${{ subnetwork.name }} # TODO Name needs to be clarified. Generated name?
+      - name: ${{ subnetwork.name }} 
         limits:
           fileStorage: ${{ subnetwork.fileStorage }}
           inMemoryStorage: ${{ subnetwork.inMemoryStorage }}
-        tolerations: []{% endfor %} # TODO Name needs to be clarified.
+        tolerations: []
+        nodeSelectorTerm:
+          matchExpressions:
+            {%- for labelSelector in subnetwork.nodepoolSelector %}
+            - key: ${{ labelSelector.key }}
+              operator: ${{ labelSelector.operator }}
+              {% if labelSelector.values|length > 0 -%}
+              values:
+              {%- for value in labelSelector.values %}
+              - ${{ value }}
+              {% endfor -%}
+              {%- endif %}
+            {% endfor %}
+    {% endfor -%}
     streams: 
     {% for stream in values.streams -%}
       - name: ${{ stream.name }}
+        type: ${{ stream.config.streamType }}
         config:
+          {% if stream.config.subjects|length > 0 -%}
           subjects:
           {% for subject in stream.config.subjects -%}
             - ${{ subject }}
           {%- endfor %}
+          {%- endif %}
           discard: ${{ stream.config.discard }}
-          retention: ${{ stream.config.retention }}
+          retention: Limits
           storage: ${{ stream.config.storage }}
-          maxConsumers: ${{ stream.config.maxConsumers }}
-          maxMsgSize: ${{ stream.config.maxMsgSize }}
+          maxConsumers: -1
+          maxMsgSize: -1
           maxMsgs: ${{ stream.config.maxMsgs }}
           maxMsgsPerSubject: ${{ stream.config.maxMsgsPerSubject }}
           maxBytes: ${{ stream.config.maxBytes }}
-        type: Standard # TODO To be clarified
         {% endfor %}
     resourceConfig:
       natssecrets:
