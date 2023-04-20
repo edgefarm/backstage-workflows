@@ -6,11 +6,10 @@ metadata:
   namespace: ${{ values.namespace }}
   {%- endif %}
 spec:
-  writeConnectionSecretToRef:
-    name: ${{ values.name }}-secrets # TODO Name needs to be clarified
+  compositeDeletePolicy: Foreground
   parameters:
     users:
-    {% for user in values.users -%}
+    {% for user in values.users %}
       - name: ${{ user.name }}
         limits:
           payload: ${{ user.limits.payload }}
@@ -64,24 +63,21 @@ spec:
             {%- for labelSelector in subnetwork.nodepoolSelector %}
             - key: ${{ labelSelector.key }}
               operator: ${{ labelSelector.operator }}
-              {% if labelSelector.values|length > 0 -%}
-              values:
-              {%- for value in labelSelector.values %}
-              - ${{ value }}
-              {% endfor -%}
-              {%- endif %}
             {% endfor %}
     {% endfor -%}
     streams: 
-    {% for stream in values.streams -%}
+    {% for stream in values.streams %}
       - name: ${{ stream.name }}
         type: ${{ stream.config.streamType }}
+        {% if stream.config.subNetworkRef -%}
+        subNetworkRef: ${{ stream.config.subNetworkRef }}
+        {%- endif %}
         config:
-          {% if stream.config.subjects|length > 0 -%}
+          {% if stream.config.streamType == "Standard" -%}
           subjects:
           {% for subject in stream.config.subjects -%}
             - ${{ subject }}
-          {%- endfor %}
+          {% endfor %}
           {%- endif %}
           discard: ${{ stream.config.discard }}
           retention: Limits
@@ -91,9 +87,10 @@ spec:
           maxMsgs: ${{ stream.config.maxMsgs }}
           maxMsgsPerSubject: ${{ stream.config.maxMsgsPerSubject }}
           maxBytes: ${{ stream.config.maxBytes }}
-        {% endfor %}
-    resourceConfig:
-      natssecrets:
-        providerConfigName: providerconfig-natssecrets
-      kubernetes:
-        providerConfigName: kubernetes-provider
+        {% if stream.config.streamType == "Aggregate" -%}
+        references:
+        {% for reference in stream.config.references -%}
+          - ${{ reference }}
+        {%- endfor %}
+        {%- endif %}
+    {% endfor %}
