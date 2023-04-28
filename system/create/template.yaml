@@ -26,11 +26,9 @@ spec:
           description: The target cluster the system will be related to
           default: minikube
           enum:
-            - minikube
-            - linode1
+            - default
           enumNames:
-            - 'Local Minikube Cluster'
-            - 'Linode 1'
+            - 'Default'
         name:
           title: Name of the system
           type: string
