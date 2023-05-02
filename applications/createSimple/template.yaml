@@ -202,17 +202,17 @@ spec:
       input:
         message: ${{ steps['read-manifest'].output.content }}
 
-    # - id: pull-request
-    #   name: Create Pull Request
-    #   action: publish:github:pull-request
-    #   input:
-    #     token: ${{ secrets.USER_OAUTH_TOKEN }}
-    #     repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
-    #     branchName: add-application-${{ parameters.name }}-definition
-    #     title: Add application ${{ parameters.name }} definition
-    #     description: Adds a new application with name ${{ parameters.name }}
-    #     gitAuthorName: ${{ user.entity.metadata.name }}
-    #     gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+    - id: pull-request
+      name: Create Pull Request
+      action: publish:github:pull-request
+      input:
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
+        repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
+        branchName: add-application-${{ parameters.name }}-definition
+        title: Add application ${{ parameters.name }} definition
+        description: Adds a new application with name ${{ parameters.name }}
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
 
   output:
     links:
