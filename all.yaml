@@ -8,4 +8,4 @@ spec:
     - ./nodes/create/template.yaml
     - ./system/create/template.yaml
     - ./network/create/template.yaml
-    - ./applications/create/template.yaml
+    - ./applications/createSimple/template.yaml
