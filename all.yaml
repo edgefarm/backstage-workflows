@@ -5,7 +5,7 @@ metadata:
   description: Contains all backstage workflows provides by edgefarm team.
 spec:
   targets:
-    - ./nodes/create/template.yaml
+    - ./devices/create/template.yaml
     - ./system/create/template.yaml
     - ./network/create/template.yaml
     - ./applications/createSimple/template.yaml

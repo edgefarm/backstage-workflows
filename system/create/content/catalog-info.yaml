@@ -5,7 +5,7 @@ metadata:
 spec:
   owner: ${{ values.owner }}
   targets:
-    - ./nodes/*/catalog-info.yaml
+    - ./devices/*/catalog-info.yaml
     - ./networks/*/catalog-info.yaml
     - ./applications/*/catalog-info.yaml
 ---

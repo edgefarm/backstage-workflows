@@ -1,17 +1,17 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: edgefarm-node-add
-  title: New Node
-  description: Add a new node to the edgefarm
+  name: edgefarm-device-add
+  title: Register a Device
+  description: Register a new device to the edgefarm
   tags:
     - edgefarm
-    - node
+    - device
     - recommended
     - kubernetes
   links:
     - title: Documentation
-      url: https://edgefarm.io/docs/nodes
+      url: https://edgefarm.io/docs/devices
 spec:
   type: service
   parameters:
@@ -30,9 +30,9 @@ spec:
               - kind: system
             defaultKind: System
         name:
-          title: Name of the node
+          title: Name of the device
           type: string
-          description: Unique name of the kubernetes node
+          description: Unique name of the kubernetes device
           maxLength: 253 # DNS subdomain name rules: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
           pattern: "^[a-z0-9][a-z0-9-]*$"
           ui:autofocus: true
@@ -50,10 +50,10 @@ spec:
       action: fetch:template
       input:
         url: ./content
-        targetPath: nodes/${{ parameters.name }}
+        targetPath: devices/${{ parameters.name }}
         values:
           clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
-          nodeName: ${{ parameters.name }}
+          deviceName: ${{ parameters.name }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
     - id: list-workspace
@@ -65,7 +65,7 @@ spec:
       name: Read File
       action: ci4rail:fs:read
       input:
-        path: ./nodes/${{ parameters.name }}/catalog-info.yaml
+        path: ./devices/${{ parameters.name }}/catalog-info.yaml
     - id: log-message
       name: Log Message
       action: debug:log
@@ -78,9 +78,9 @@ spec:
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}
         repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
-        branchName: add-node-${{ parameters.name }}-definition
-        title: Add node ${{ parameters.name }} definition
-        description: Adds a new node with name ${{ parameters.name }}
+        branchName: add-device-${{ parameters.name }}-definition
+        title: Add device ${{ parameters.name }} definition
+        description: Adds a new device with name ${{ parameters.name }}
         gitAuthorName: ${{ user.entity.metadata.name }}
         gitAuthorEmail: ${{ user.entity.spec.profile.email }}
 
