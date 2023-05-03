@@ -9,3 +9,4 @@ spec:
     - ./system/create/template.yaml
     - ./network/create/template.yaml
     - ./applications/createSimple/template.yaml
+    - ./releases/create/template.yaml

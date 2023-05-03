@@ -8,6 +8,7 @@ spec:
     - ./devices/*/catalog-info.yaml
     - ./networks/*/catalog-info.yaml
     - ./applications/*/catalog-info.yaml
+    - ./releases/*/catalog-info.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
