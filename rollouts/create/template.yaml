@@ -39,6 +39,10 @@ spec:
               kind: Component
               spec.type: Release
             defaultKind: Component
+    - title: Select your target device
+      required:
+        - target
+      properties:
         target:
           title: Select your target device
           description: Here you can select one of your existing target devices.
@@ -76,22 +80,15 @@ spec:
       action: fetch:template
       input:
         url: ./content
-        targetPath: releases/rollouts/${{ steps['generate-name'].output.content }}
+        targetPath: releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}
         values:
           name: ${{ steps['generate-name'].output.content }}
           clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
           image: ${{ steps['release-fetch'].output.entity.metadata.annotations['edgefarm.io/release-image'] }}
           target: ${{ steps['device-fetch'].output.entity.metadata.name }}
-          release: ${{ parameters.release }}
+          releaseRef: ${{ parameters.release }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
-    # - id: rename-manifest
-    #   name: Rename manifest file
-    #   action: fs:rename
-    #   input:
-    #     files:
-    #       - from: releases/rollouts/plan-manifest.yaml
-    #         to: releases/rollouts/${{ steps['generate-name'].output.content }}.yaml
     - id: list-workspace
       name: List Workspace
       action: debug:log
@@ -101,7 +98,7 @@ spec:
       name: Read Catalog-info.yaml
       action: ci4rail:fs:read
       input:
-        path: ./releases/rollouts/${{ steps['generate-name'].output.content }}/catalog-info.yaml
+        path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/catalog-info.yaml
     - id: log-message1
       name: Log Catalog-info.yaml
       action: debug:log
@@ -112,24 +109,24 @@ spec:
       name: Read manifest.yaml
       action: ci4rail:fs:read
       input:
-        path: ./releases/rollouts/${{ steps['generate-name'].output.content }}/manifests/plan.yaml
+        path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/manifests/plan.yaml
     - id: log-message2
       name: Log manifest.yaml
       action: debug:log
       input:
         message: ${{ steps['read-manifest'].output.content }}
 
-    # - id: pull-request
-    #   name: Create Pull Request
-    #   action: publish:github:pull-request
-    #   input:
-    #     token: ${{ secrets.USER_OAUTH_TOKEN }}
-    #     repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
-    #     branchName: add-rollout-${{ steps['generate-name'].output.content }}-definition
-    #     title: Add rollout ${{ steps['generate-name'].output.content }} definition
-    #     description: Adds a new rollout with name ${{ steps['generate-name'].output.content }}
-    #     gitAuthorName: ${{ user.entity.metadata.name }}
-    #     gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+    - id: pull-request
+      name: Create Pull Request
+      action: publish:github:pull-request
+      input:
+        token: ${{ secrets.USER_OAUTH_TOKEN }}
+        repoUrl: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/repo'] }}
+        branchName: add-rollout-${{ steps['generate-name'].output.content }}-definition
+        title: Add rollout ${{ steps['generate-name'].output.content }} definition
+        description: Adds a new rollout with name ${{ steps['generate-name'].output.content }}
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
 
   output:
     links:

@@ -3,14 +3,15 @@ kind: Component
 metadata:
   name: ${{ values.name }}
   annotations:
-    'edgefarm.io/cluster': ${{ values.clusterName }}
-    'edgefarm.io/release-image': ${{ values.image }}
+    "edgefarm.io/cluster": ${{ values.clusterName }}
+    "edgefarm.io/release-image": ${{ values.image }}
   links:
     - url: https://www.ci4rail.com
       title: Ci4Rail Website
       icon: backstage
 spec:
-  type: Plan
+  type: Rollout
   owner: ${{ values.owner }}
   lifecycle: production
   system: ${{ values.system }}
+  dependsOn: ["${{ values.releaseRef }}"]

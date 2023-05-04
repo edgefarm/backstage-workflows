@@ -35,8 +35,8 @@ spec:
           type: string
           description: Unique name of the kubernetes device
           ui:autofocus: true
-          ui:options:
-            rows: 5
+          maxLength: 63
+          pattern: "^[a-z0-9A-Z-_.]+$"
         image:
           title: Docker image of the Firmware
           type: string
@@ -56,7 +56,7 @@ spec:
         targetPath: releases/${{ parameters.name }}
         values:
           clusterName: ${{ steps['system-fetch'].output.entity.metadata.annotations['edgefarm.io/cluster'] }}
-          name: ${{ parameters.image }}
+          name: ${{ parameters.name }}
           image: ${{ parameters.image }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
