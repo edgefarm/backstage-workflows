@@ -1,12 +1,12 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: edgefarm-release-add
-  title: Add a new Release
-  description: Add a new Release to the edgefarm. Later on you are able to create a upgrade plan for this Release.
+  name: edgefarm-firmware-add
+  title: Add a new Firmware
+  description: Add a new Firmware to the edgefarm. Later on you are able to create a upgrade plan for this Firmware.
   tags:
     - edgefarm
-    - release
+    - firmware
     - upgrade
     - recommended
   links:
@@ -38,7 +38,7 @@ spec:
           ui:options:
             rows: 5
         image:
-          title: Docker image of the Release
+          title: Docker image of the Firmware
           type: string
           description: Full path of the docker image which contains the release. e.g. registry.com/image:1.2.43
 
