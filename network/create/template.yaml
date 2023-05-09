@@ -405,6 +405,6 @@ spec:
         gitAuthorEmail: ${{ user.entity.spec.profile.email }}
   output:
     links:
-      - title: Open pull request
+      - title: Verify on Github
         description: foobar
         url: ${{ steps['pull-request'].output.remoteUrl }}

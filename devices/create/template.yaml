@@ -96,5 +96,5 @@ spec:
 
   output:
     links:
-      - title: Open pull request
+      - title: Verify on Github
         url: ${{ steps['pull-request'].output.remoteUrl }}
