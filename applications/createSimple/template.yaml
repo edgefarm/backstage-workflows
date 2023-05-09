@@ -71,28 +71,25 @@ spec:
               type: string
               title: Container startup command
               description: "Give your container a special command to start."
+              ui:widget: hidden
             args:
               type: string
               title: Command arguments
               description: "Give your container command some arguments to start with."
-            envVars:
-              type: array
-              title: Environment variables
-              description: "Set environment variables for your container. Format: KEY=VALUE"
-              items:
-                type: string
-                pattern: "^[A-Za-z_]+[A-Za-z0-9_]*=.*$" # https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config
+              ui:widget: hidden
             cpu:
               type: string
               title: CPU
               description: "Specify the amount of cpu for requests and limits. E.g.: 0.4"
               default: "0.25"
+              ui:widget: hidden
             memory:
               type: string
               title: Memory
               description: "Specify the amount of memory for requests and limits. E.g.: 512Mi"
               pattern: "^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$"
               default: "256Mi"
+              ui:widget: hidden
             network:
               type: object
               title: Network
@@ -114,50 +111,6 @@ spec:
                   type: string
                   title: Username
                   description: "Define the username within your network your component uses."
-            storage:
-              type: object
-              title: Storage
-              description: "Specify the storage for this component."
-              properties:
-                hostPaths:
-                  type: array
-                  title: Hostpath
-                  description: A hostPath volume mounts a file or directory from the host node's filesystem into your Container.
-                  items:
-                    type: object
-                    required:
-                      - name
-                      - path
-                      - mountPath
-                      - type
-                    properties:
-                      name:
-                        type: string
-                        title: Name
-                        description: Specify the name of this hostPath mount.
-                      path:
-                        type: string
-                        title: Host path
-                        description: Specify the path on the host system.
-                      mountPath:
-                        type: string
-                        title: Remote path
-                        description: Specify the path in the container.
-                      type:
-                        type: string
-                        title: Type
-                        default: Directory
-                        enum:
-                          [
-                            "Directory",
-                            "DirectoryOrCreate",
-                            "FileOrCreate",
-                            "File",
-                            "Socket",
-                            "CharDevice",
-                            "BlockDevice",
-                          ]
-
   steps:
     - id: system-fetch
       name: Fetch system entity
