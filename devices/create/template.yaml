@@ -56,24 +56,34 @@ spec:
           deviceName: ${{ parameters.name }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
-    - id: list-workspace
-      name: List Workspace
-      action: debug:log
-      input:
-        listWorkspace: true
-    - id: read-file
-      name: Read File
-      action: ci4rail:fs:read
-      input:
-        path: ./devices/${{ parameters.name }}/catalog-info.yaml
-    - id: log-message
-      name: Log Message
-      action: debug:log
-      input:
-        message: ${{ steps['read-file'].output.content }}
+    # - id: list-workspace
+    #   name: List Workspace
+    #   action: debug:log
+    #   input:
+    #     listWorkspace: true
+    # - id: read-catalog-info
+    #   name: Read Catalog Info
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./devices/${{ parameters.name }}/catalog-info.yaml
+    # - id: log-catalog-info
+    #   name: Log Catalog Info
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-catalog-info'].output.content }}
+    # - id: read-manifest
+    #   name: Read Manifest
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./devices/${{ parameters.name }}/manifests/manifest.yaml
+    # - id: log-manifest
+    #   name: Log Manifest
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-manifest'].output.content }}
 
     - id: pull-request
-      name: Create Pull Request
+      name: Persist changes on Github
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}

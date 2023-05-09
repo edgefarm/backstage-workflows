@@ -89,35 +89,35 @@ spec:
           releaseRef: ${{ parameters.release }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
-    - id: list-workspace
-      name: List Workspace
-      action: debug:log
-      input:
-        listWorkspace: true
-    - id: read-catalog-info
-      name: Read Catalog-info.yaml
-      action: ci4rail:fs:read
-      input:
-        path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/catalog-info.yaml
-    - id: log-message1
-      name: Log Catalog-info.yaml
-      action: debug:log
-      input:
-        message: ${{ steps['read-catalog-info'].output.content }}
+    # - id: list-workspace
+    #   name: List Workspace
+    #   action: debug:log
+    #   input:
+    #     listWorkspace: true
+    # - id: read-catalog-info
+    #   name: Read Catalog-info.yaml
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/catalog-info.yaml
+    # - id: log-message1
+    #   name: Log Catalog-info.yaml
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-catalog-info'].output.content }}
 
-    - id: read-manifest
-      name: Read manifest.yaml
-      action: ci4rail:fs:read
-      input:
-        path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/manifests/plan.yaml
-    - id: log-message2
-      name: Log manifest.yaml
-      action: debug:log
-      input:
-        message: ${{ steps['read-manifest'].output.content }}
+    # - id: read-manifest
+    #   name: Read manifest.yaml
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./releases/${{ steps['release-fetch'].output.entity.metadata.name }}/rollouts/${{ steps['generate-name'].output.content }}/manifests/plan.yaml
+    # - id: log-message2
+    #   name: Log manifest.yaml
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-manifest'].output.content }}
 
     - id: pull-request
-      name: Create Pull Request
+      name: Persist changes on Github
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}

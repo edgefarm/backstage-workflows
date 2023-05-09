@@ -93,34 +93,34 @@ spec:
           components: ${{ parameters.components }}
           owner: ${{ user.entity.metadata.namespace }}/${{ user.entity.metadata.name }}
           system: ${{ parameters.system }}
-    - id: list-workspace
-      name: List Workspace
-      action: debug:log
-      input:
-        listWorkspace: true
-    - id: read-catalog-info
-      name: Read generated catalog-into.yaml
-      action: ci4rail:fs:read
-      input:
-        path: ./applications/${{ parameters.name }}/catalog-info.yaml
-    - id: log-catalog-info
-      name: Log generated catalog-into.yaml
-      action: debug:log
-      input:
-        message: ${{ steps['read-catalog-info'].output.content }}
-    - id: read-manifest
-      name: Read generated manifest
-      action: ci4rail:fs:read
-      input:
-        path: ./applications/${{ parameters.name }}/manifests/application.yaml
-    - id: log-manifest
-      name: Log  generated manifest
-      action: debug:log
-      input:
-        message: ${{ steps['read-manifest'].output.content }}
+    # - id: list-workspace
+    #   name: List Workspace
+    #   action: debug:log
+    #   input:
+    #     listWorkspace: true
+    # - id: read-catalog-info
+    #   name: Read generated catalog-into.yaml
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./applications/${{ parameters.name }}/catalog-info.yaml
+    # - id: log-catalog-info
+    #   name: Log generated catalog-into.yaml
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-catalog-info'].output.content }}
+    # - id: read-manifest
+    #   name: Read generated manifest
+    #   action: ci4rail:fs:read
+    #   input:
+    #     path: ./applications/${{ parameters.name }}/manifests/application.yaml
+    # - id: log-manifest
+    #   name: Log  generated manifest
+    #   action: debug:log
+    #   input:
+    #     message: ${{ steps['read-manifest'].output.content }}
 
     - id: pull-request
-      name: Create Pull Request
+      name: Persist changes on Github
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}
