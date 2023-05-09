@@ -90,7 +90,7 @@ spec:
 
   output:
     links:
-      - title: Open repository
+      - title: Verify on Github
         url: ${{ steps['publish'].output.remoteUrl }}
       - title: Open in catalog
         icon: catalog

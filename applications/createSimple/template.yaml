@@ -156,7 +156,7 @@ spec:
     #     message: ${{ steps['read-manifest'].output.content }}
 
     - id: pull-request
-      name: Create Pull Request
+      name: Persist changes on Github
       action: publish:github:pull-request
       input:
         token: ${{ secrets.USER_OAUTH_TOKEN }}
@@ -169,5 +169,5 @@ spec:
 
   output:
     links:
-      - title: Open pull request
+      - title: Verify on Github
         url: ${{ steps['pull-request'].output.remoteUrl }}
