@@ -51,9 +51,9 @@ spec:
             {% endfor -%}
             {%- endif %}
     {% endfor -%}
-    subNetworks: 
+    subNetworks:
     {%- for subnetwork in values.subnetworks %}
-      - name: ${{ subnetwork.name }} 
+      - name: ${{ subnetwork.name }}
         limits:
           fileStorage: ${{ subnetwork.fileStorage }}
           inMemoryStorage: ${{ subnetwork.inMemoryStorage }}
@@ -65,7 +65,7 @@ spec:
               operator: ${{ labelSelector.operator }}
             {% endfor %}
     {% endfor -%}
-    streams: 
+    streams:
     {% for stream in values.streams %}
       - name: ${{ stream.name }}
         type: ${{ stream.config.streamType }}
@@ -76,7 +76,7 @@ spec:
           {% if stream.config.streamType == "Standard" -%}
           subjects:
           {% for subject in stream.config.subjects -%}
-            - ${{ subject }}
+            - "${{ subject }}"
           {% endfor %}
           {%- endif %}
           discard: ${{ stream.config.discard }}
