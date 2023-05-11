@@ -20,8 +20,8 @@ metadata:
     - edgefarm
     - project
   annotations:
-    "edgefarm.io/cluster": ${{ values.clusterName }}
-    "edgefarm.io/repo": ${{ values.repoUrl }}
+    'edgefarm.io/cluster': ${{ values.clusterName }}
+    'edgefarm.io/repo': ${{ values.repoUrl }}
 spec:
   lifecycle: production
   owner: ${{ values.owner }}

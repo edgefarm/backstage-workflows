@@ -36,7 +36,7 @@ spec:
           description: Unique name of the kubernetes device
           ui:autofocus: true
           maxLength: 63
-          pattern: "^[a-z0-9A-Z-_.]+$"
+          pattern: '^[a-z0-9A-Z-_.]+$'
         image:
           title: Docker image of the Firmware
           type: string

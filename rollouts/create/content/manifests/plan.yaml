@@ -10,7 +10,7 @@ spec:
       - {
           key: kubernetes.io/hostname,
           operator: In,
-          values: ["${{ values.target }}"],
+          values: ['${{ values.target }}'],
         }
   serviceAccountName: system-upgrade
   drain:
@@ -18,13 +18,13 @@ spec:
     disableEviction: true
   version: bar
   tolerations:
-    - key: "edgefarm.io"
-      operator: "Exists"
-      effect: "NoSchedule"
+    - key: 'edgefarm.io'
+      operator: 'Exists'
+      effect: 'NoSchedule'
   upgrade:
     image: ${{ values.image }}
-    command: ["/entrypoint.sh"]
-    args: ["/tmp/concurrent", "bar", "/tmp/successfile"]
+    command: ['/entrypoint.sh']
+    args: ['/tmp/concurrent', 'bar', '/tmp/successfile']
     volumes:
       - name: tmp
         source: /tmp

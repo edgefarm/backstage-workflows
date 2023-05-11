@@ -35,7 +35,7 @@ spec:
           type: string
           description: Unique name of the kubernetes application
           maxLength: 253 # DNS subdomain name rules: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
-          pattern: "^[a-z0-9][a-z0-9-]*$"
+          pattern: '^[a-z0-9][a-z0-9-]*$'
           ui:autofocus: true
           ui:options:
             rows: 5
@@ -71,30 +71,30 @@ spec:
             command:
               type: string
               title: Container startup command
-              description: "Give your container a special command to start."
+              description: 'Give your container a special command to start.'
               ui:widget: hidden
             args:
               type: string
               title: Command arguments
-              description: "Give your container command some arguments to start with."
+              description: 'Give your container command some arguments to start with.'
               ui:widget: hidden
             cpu:
               type: string
               title: CPU
-              description: "Specify the amount of cpu for requests and limits. E.g.: 0.4"
-              default: "0.25"
+              description: 'Specify the amount of cpu for requests and limits. E.g.: 0.4'
+              default: '0.25'
               ui:widget: hidden
             memory:
               type: string
               title: Memory
-              description: "Specify the amount of memory for requests and limits. E.g.: 512Mi"
-              pattern: "^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$"
-              default: "256Mi"
+              description: 'Specify the amount of memory for requests and limits. E.g.: 512Mi'
+              pattern: '^([1-9][0-9]{0,63})(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)$'
+              default: '256Mi'
               ui:widget: hidden
             network:
               type: object
               title: Network
-              description: "Specify where the component should connect to."
+              description: 'Specify where the component should connect to.'
               required:
                 - network
                 - subnetwork
@@ -103,15 +103,15 @@ spec:
                 network:
                   type: string
                   title: Network
-                  description: "Define the network name to connect to."
+                  description: 'Define the network name to connect to.'
                 subnetwork:
                   type: string
                   title: Subnetwork
-                  description: "Define the subnetwork within the network to use."
+                  description: 'Define the subnetwork within the network to use.'
                 user:
                   type: string
                   title: Username
-                  description: "Define the username within your network your component uses."
+                  description: 'Define the username within your network your component uses.'
   steps:
     - id: system-fetch
       name: Fetch system entity
