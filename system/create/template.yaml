@@ -28,13 +28,13 @@ spec:
           enum:
             - default
           enumNames:
-            - "Default"
+            - 'Default'
         name:
           title: Name of the system
           type: string
           description: Unique name of the EdgeFarm system
           maxLength: 63
-          pattern: "^[a-z0-9A-Z-_.]+$"
+          pattern: '^[a-z0-9A-Z-_.]+$'
           ui:autofocus: true
           ui:options:
             rows: 5
@@ -69,7 +69,7 @@ spec:
       name: Create a new repository
       action: publish:github
       input:
-        allowedHosts: ["github.com"]
+        allowedHosts: ['github.com']
         token: ${{ secrets.USER_OAUTH_TOKEN }}
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}
@@ -86,7 +86,7 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: "/catalog-info.yaml"
+        catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:

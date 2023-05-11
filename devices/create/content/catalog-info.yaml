@@ -3,7 +3,7 @@ kind: Component
 metadata:
   name: ${{ values.deviceName }}
   annotations:
-    "edgefarm.io/cluster": ${{ values.clusterName }}
+    'edgefarm.io/cluster': ${{ values.clusterName }}
 spec:
   type: Device
   owner: ${{ values.owner }}
